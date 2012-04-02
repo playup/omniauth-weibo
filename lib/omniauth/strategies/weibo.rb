@@ -18,7 +18,7 @@ module OmniAuth
         # SET :parse because weibo oauth2 access_token response with "content-type"=>"text/plain;charset=UTF-8", 
         # and when you use ruby 1.8.7, the response body was not a valid HASH (see: https://github.com/intridea/oauth2/issues/75)
         # :body=>"{\"access_token\":\"2.001FOK5CacB2wCc20a59773d0uSGnj\",\"expires_in\":86400,\"uid\":\"2189335154\"}"}
-        :parse => :json, 
+        :parse => :json
       }
       
       def request_phase
@@ -30,12 +30,14 @@ module OmniAuth
       # additional calls (if the user id is returned with the token
       # or as a URI parameter). This may not be possible with all
       # providers.
-      uid{ raw_info['uid'] }
+      # uid{ raw_info['uid'] }
+
+      uid { @user_id = access_token.params[:uid] || access_token.params['uid'] }
 
       info do
         {
           :name => raw_info['name'],
-          :email => raw_info['email']
+          :nickname => raw_info['screen_name']
         }
       end
 
@@ -51,8 +53,9 @@ module OmniAuth
         # this doesn't align with weibo API (see: http://open.weibo.com/wiki/2/account/get_uid)
         access_token.options[:mode] = :query
         access_token.options[:param_name] = 'access_token'
-        @raw_info ||= access_token.get('/2/account/get_uid.json').parsed
+        #@raw_info ||= access_token.get('/2/account/get_uid.json').parsed
         # maybe consider another call towards /account/profile/basic since /account/get_uid call only returns uid
+        @raw_info ||= access_token.get('/2/users/show.json', :params => { :uid => @user_id }).parsed
       end
     end
   end
