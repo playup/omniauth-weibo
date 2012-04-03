@@ -37,7 +37,8 @@ module OmniAuth
       info do
         {
           :name => raw_info['name'],
-          :nickname => raw_info['screen_name']
+          :nickname => raw_info['screen_name'],
+          :image => raw_info["profile_image_url"]
         }
       end
 
