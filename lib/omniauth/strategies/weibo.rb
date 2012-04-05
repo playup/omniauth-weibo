@@ -5,6 +5,7 @@ module OmniAuth
     class Weibo < OmniAuth::Strategies::OAuth2
       # Give your strategy a name.
       option :name, "weibo"
+      option :display, "default"
 
       # This is where you pass the options you would pass when
       # initializing your consumer from the OAuth gem.
@@ -22,7 +23,7 @@ module OmniAuth
       }
       
       def request_phase
-        super
+        redirect client.auth_code.authorize_url({:redirect_uri => callback_url, :display => options["display"]}.merge(options.authorize_params))
       end
       
       # These are called after authentication has succeeded. If
